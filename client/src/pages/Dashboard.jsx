@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Toaster } from 'react-hot-toast';
 import Header from '../components/Header';
 import RequestTable from '../components/RequestTable';
+import Footer from '../components/Footer';
 
 const categories = [
   { id: 1, name: 'General Queries', description: 'Get answers to general questions about our service.' },
@@ -56,6 +57,7 @@ const Dashboard = () => {
           </div>
           <RequestTable selectedCategory={selectedCategory} />
         </div>
+        <Footer/>
       </div>
     </>
   );
