@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { FaExclamationCircle } from 'react-icons/fa'; 
-import { toast } from 'react-hot-toast'; // Import react-hot-toast
+import { toast } from 'react-hot-toast'; 
 
 const RequestTable = ({ selectedCategory }) => {
   const [requests, setRequests] = useState([]);

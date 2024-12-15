@@ -4,7 +4,7 @@ const { oauth2Client } = require('../utils/googleConfig');
 const User = require('../models/userSchema');
 const bcrypt = require('bcrypt');
 
-/* GET Google Authentication API. */
+
 const googleAuth = async (req, res, next) => {
     const code = req.query.code;
     try {
@@ -14,7 +14,7 @@ const googleAuth = async (req, res, next) => {
             `https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${googleRes.tokens.access_token}`
         );
         const { email, name} = userRes.data;
-        // console.log(userRes);
+        
         let user = await User.findOne({ email });
 
         if (!user) {

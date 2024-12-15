@@ -3,7 +3,7 @@ const { deleteRequest } = require('../controllers/editController');
 
 const router = express.Router();
 
-// DELETE request route
-router.delete('/:requestId', deleteRequest); // :requestId is the ID of the request to delete
+
+router.delete('/:requestId', deleteRequest); 
 
 module.exports = router;

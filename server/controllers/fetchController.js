@@ -4,11 +4,11 @@ const fetchRequests = async (req, res) => {
     try {
         console.log("Fetching requests...");
         
-        const { category } = req.query; // Retrieve category from query parameters
+        const { category } = req.query; 
         
         let query = {};
         if (category) {
-            query = { category }; // Filter by category if provided
+            query = { category };
         }
 
         const response = await Request.find(query);
