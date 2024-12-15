@@ -104,7 +104,7 @@ const Signup = () => {
       </form>
       <div className='flex justify-center items-center'>
             <div className='w-32 h-1 bg-white rounded-md m-1'></div>
-            <p>OR</p>
+            <p className='text-white'>OR</p>
             <div className='w-32 h-1 bg-white m-1 rounded-md'></div>
         </div>
         <div className="flex flex-col justify-center items-center gap-2 text-sm font-normal">
