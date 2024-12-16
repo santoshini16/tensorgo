@@ -4,9 +4,8 @@ const intercom = require('../utils/intercom');
 
 const createRequest = async (req, res) => {
   const { category, additionalComments, request } = req.body;
-   console.log('log...',req.user)
+
   try {
-  
     const dbrequest = await Request.create({
       userId: req.user._id,
       category,
@@ -19,7 +18,13 @@ const createRequest = async (req, res) => {
       body: `New request in category ${category}: ${request}`,
       from: { type: 'user', email: req.user.email },
     };
-    await intercom.createMessage(intercomMessage);
+
+    const intercomResponse = await intercom.createMessage(intercomMessage);
+    console.log(intercomResponse)
+
+   
+    dbrequest.intercomConversationId = intercomResponse.conversation_id;
+    await dbrequest.save();
 
     res.status(201).json({
       message: 'Request created successfully',
@@ -34,7 +39,6 @@ const createRequest = async (req, res) => {
     });
   }
 };
-
 
 
 module.exports = {

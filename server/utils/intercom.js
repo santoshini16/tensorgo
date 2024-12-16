@@ -1,6 +1,5 @@
 const axios = require('axios');
 
-
 const intercomApi = axios.create({
   baseURL: 'https://api.intercom.io',
   headers: {
@@ -19,8 +18,22 @@ const createMessage = async (messageDetails) => {
   }
 };
 
+const closeConversation = async (conversationId) => {
+  try {
+    const response = await intercomApi.post(`/conversations/${conversationId}/parts`, {
+      message_type: 'close',
+      admin_id: process.env.INTERCOM_ADMIN_ID, 
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error('Failed to close Intercom conversation: ' + error.message);
+  }
+};
+
 module.exports = {
   createMessage,
+  closeConversation,
 };
+
 
 
