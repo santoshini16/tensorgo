@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { BellIcon } from '@heroicons/react/outline';
 import { useNavigate } from 'react-router-dom';
 import Modal from './Modal';
-import { toast } from 'react-hot-toast'; // Import toast
+import { toast } from 'react-hot-toast'; 
 
 const Header = ({ onSearch, notifications }) => {
 
@@ -55,15 +55,15 @@ const Header = ({ onSearch, notifications }) => {
       const data = await response.json();
   
       if (response.ok) {
-        toast.success(data.alert);  // Success toast message
+        toast.success(data.alert);  
         setIsModalOpen(false); 
       } else {
-        toast.error('Failed to create request: ' + data.message);  // Error toast message
+        toast.error('Failed to create request: ' + data.message); 
       }
       
     } catch (error) {
       console.error('Error creating request:', error);
-      toast.error('An error occurred while creating the request.');  // Error toast message
+      toast.error('An error occurred while creating the request.');  
     }
   };
   

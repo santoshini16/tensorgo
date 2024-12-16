@@ -78,6 +78,7 @@ const RequestTable = ({ selectedCategory }) => {
       }
 
       const updatedData = await response.json();
+      console.log(updatedData)
       setRequests((prevRequests) =>
         prevRequests.map((req) => (req._id === editingRequest._id ? updatedData.result : req))
       );
