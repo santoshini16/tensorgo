@@ -30,9 +30,23 @@ const closeConversation = async (conversationId) => {
   }
 };
 
+const updateConversation = async (conversationId, updatedMessage) => {
+  try {
+    const response = await intercomApi.post(`/conversations/${conversationId}/parts`, {
+      message_type: 'note', 
+      admin_id: process.env.INTERCOM_ADMIN_ID,
+      body: updatedMessage,
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error('Failed to update Intercom conversation: ' + error.message);
+  }
+};
+
 module.exports = {
   createMessage,
   closeConversation,
+  updateConversation
 };
 
 

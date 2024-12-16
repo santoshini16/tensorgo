@@ -11,10 +11,8 @@ const deleteRequest = async (req, res) => {
       return res.status(404).json({ message: 'Request not found' });
     }
 
-    
     await Request.findByIdAndDelete(requestId);
 
-   
     const conversationId = request.intercomConversationId; 
     console.log('conversationid',conversationId)
     if (conversationId) {
@@ -33,8 +31,49 @@ const deleteRequest = async (req, res) => {
   }
 };
 
+const updateRequest = async (req, res) => {
+  const { editId } = req.params;
+  const { category, additionalComments, request } = req.body;
+  console.log(req.body)
+
+  try {
+    // Find the request in the database
+    const existingRequest = await Request.findById(editId);
+console.log('existing..',existingRequest)
+
+    if (!existingRequest) {
+      return res.status(404).json({ message: 'Request not found' });
+    }
+
+    // Update the request in the database
+    existingRequest.category = category || existingRequest.category;
+    existingRequest.additionalComments = additionalComments || existingRequest.additionalComments;
+    existingRequest.request = request || existingRequest.request;
+    await existingRequest.save();
+
+    // Update the conversation in Intercom
+    const conversationId = existingRequest.intercomConversationId; // Ensure this ID exists
+    if (conversationId) {
+      const updatedMessage = `Updated request in category ${category}: ${request}`;
+      await intercom.updateConversation(conversationId, updatedMessage);
+    }
+
+    res.status(200).json({
+      message: 'Request and Intercom conversation updated successfully',
+      request: existingRequest,
+    });
+  } catch (error) {
+    console.error('Error updating request:', error.message);
+    res.status(500).json({
+      message: 'Failed to update request',
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   deleteRequest,
+  updateRequest
 };
 
 

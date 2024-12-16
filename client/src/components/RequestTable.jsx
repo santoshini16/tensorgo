@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { FaExclamationCircle, FaRegFile, FaCommentDots } from 'react-icons/fa'; 
+import { FaExclamationCircle, FaRegFile, FaCommentDots, FaEdit } from 'react-icons/fa'; 
 import { toast } from 'react-hot-toast'; 
+import Modal from './Modal';
 
 const RequestTable = ({ selectedCategory }) => {
   const [requests, setRequests] = useState([]);
   const [comments, setComments] = useState([]); 
   const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingRequest, setEditingRequest] = useState(null);
 
   useEffect(() => {
     const fetchRequests = async () => {
@@ -31,7 +34,8 @@ const RequestTable = ({ selectedCategory }) => {
         }
 
         const data = await response.json();
-        setRequests(data.result);
+        const formattedRequests = Array.isArray(data.result) ? data.result : [data.result];
+        setRequests(formattedRequests);
 
         const extractedComments = data.result
           .map((req) => req.additionalComments)
@@ -46,6 +50,44 @@ const RequestTable = ({ selectedCategory }) => {
 
     fetchRequests();
   }, [selectedCategory]);
+
+  const handleEdit = (request) => {
+    setEditingRequest(request);
+    setIsModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+    setEditingRequest(null);
+  };
+
+  const handleModalSubmit = async (updatedRequest) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://localhost:3000/api/${editingRequest._id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(updatedRequest),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to update request with ID ${editingRequest._id}. Status: ${response.status}`);
+      }
+
+      const updatedData = await response.json();
+      setRequests((prevRequests) =>
+        prevRequests.map((req) => (req._id === editingRequest._id ? updatedData.result : req))
+      );
+      toast.success(`Request with ID ${editingRequest._id} updated successfully.`);
+      handleModalClose();
+    } catch (error) {
+      console.error(`Failed to update request with ID ${editingRequest._id}:`, error.message);
+      toast.error(`Failed to update request with ID ${editingRequest._id}.`);
+    }
+  };
 
   const handleDelete = async (id) => {
     try {
@@ -78,20 +120,19 @@ const RequestTable = ({ selectedCategory }) => {
 
   return (
     <div className='flex flex-col justify-center items-center mt-8'>
-        <h2 className="text-2xl font-bold text-white ">Customer Request Information</h2>
+      <h2 className="text-2xl font-bold text-white">Customer Request Information</h2>
       <div className="flex gap-24 justify-center">
-      {noDataFound ? (
-        <motion.div
-          className="flex justify-center items-center flex-col text-white mt-16"
-          initial={{ opacity: 0, scale: 0.5 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5 }}
-        >
-          <FaExclamationCircle className="text-4xl mb-4" />
-          <p className="text-lg">No data found</p>
-        </motion.div>
-      ) : (
-        <> 
+        {noDataFound ? (
+          <motion.div
+            className="flex justify-center items-center flex-col text-white mt-16"
+            initial={{ opacity: 0, scale: 0.5 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
+          >
+            <FaExclamationCircle className="text-4xl mb-4" />
+            <p className="text-lg">No data found</p>
+          </motion.div>
+        ) : (
           <div className="mt-8 flex gap-24">
             <div>
               <h2 className="text-xl font-bold text-white mb-4 flex items-center">
@@ -111,11 +152,16 @@ const RequestTable = ({ selectedCategory }) => {
                   {requests.map((req) => (
                     <tr key={req._id}>
                       <td className="border px-4 py-2">{req.category}</td>
-                      <td className="border px-4 py-2 ">
-                         {req.request}
-                      </td>
+                      <td className="border px-4 py-2">{req.request}</td>
                       <td className="border px-4 py-2">{new Date(req.createdAt).toLocaleString()}</td>
                       <td className="border px-4 py-2">
+                        <button
+                          className="px-3 py-1 text-sm bg-blue-500 text-white rounded-lg hover:bg-blue-600 mr-1"
+                          onClick={() => handleEdit(req)}
+                        >
+                          
+                          Edit
+                        </button>
                         <button
                           className="px-3 py-1 text-sm bg-red-500 text-white rounded-lg hover:bg-red-600"
                           onClick={() => handleDelete(req._id)}
@@ -149,14 +195,21 @@ const RequestTable = ({ selectedCategory }) => {
               </div>
             </div>
           </div>
-        </>
+        )}
+      </div>
+
+      {isModalOpen && (
+        <Modal
+          onClose={handleModalClose}
+          onSubmit={handleModalSubmit}
+        />
       )}
     </div>
-  </div>
   );
 };
 
 export default RequestTable;
+
 
 
 
